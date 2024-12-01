@@ -1,5 +1,3 @@
-// Define your models here.
-
 export interface Model {
   id: string;
   label: string;
@@ -9,17 +7,17 @@ export interface Model {
 
 export const models: Array<Model> = [
   {
-    id: 'gpt-4o-mini',
-    label: 'GPT 4o mini',
-    apiIdentifier: 'gpt-4o-mini',
-    description: 'Small model for fast, lightweight tasks',
+    id: "gemini-pro",
+    label: "Gemini Pro",
+    apiIdentifier: "gemini-1.5-pro-latest",
+    description: "Best for complex tasks and reasoning",
   },
   {
-    id: 'gpt-4o',
-    label: 'GPT 4o',
-    apiIdentifier: 'gpt-4o',
-    description: 'For complex, multi-step tasks',
+    id: "gemini-flash",
+    label: "Gemini Flash",
+    apiIdentifier: "gemini-1.5-flash-latest",
+    description: "Faster responses for simpler tasks",
   },
 ] as const;
 
-export const DEFAULT_MODEL_NAME: string = 'gpt-4o-mini';
+export const DEFAULT_MODEL_NAME = "gemini-flash-8b";
