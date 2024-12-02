@@ -20,4 +20,4 @@ export const models: Array<Model> = [
   },
 ] as const;
 
-export const DEFAULT_MODEL_NAME = "gemini-flash-1.5-latest";
+export const DEFAULT_MODEL_NAME = "gemini-flash";
