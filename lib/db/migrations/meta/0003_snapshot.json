@@ -1,0 +1,78 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "id": "d8901b7c-e2c3-4e8c-9b4f-8f3d3d3d3d3d",
+  "prevId": "b5d8e862-936f-4419-a50f-97be3e7fe665",
+  "tables": {
+    "Attachment": {
+      "name": "Attachment",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "chatId": {
+          "name": "chatId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "messageId": {
+          "name": "messageId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contentType": {
+          "name": "contentType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Attachment_chatId_Chat_id_fk": {
+          "name": "Attachment_chatId_Chat_id_fk",
+          "tableFrom": "Attachment",
+          "tableTo": "Chat",
+          "columnsFrom": ["chatId"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Attachment_messageId_Message_id_fk": {
+          "name": "Attachment_messageId_Message_id_fk",
+          "tableFrom": "Attachment",
+          "tableTo": "Message",
+          "columnsFrom": ["messageId"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      }
+    }
+  }
+}

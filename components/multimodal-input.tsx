@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
 import type {
   Attachment,
   ChatRequestOptions,
   CreateMessage,
   Message,
-} from 'ai';
-import cx from 'classnames';
-import { motion } from 'framer-motion';
-import type React from 'react';
+} from "ai";
+import cx from "classnames";
+import { motion } from "framer-motion";
+import type React from "react";
 import {
   useRef,
   useEffect,
@@ -17,27 +17,27 @@ import {
   type Dispatch,
   type SetStateAction,
   type ChangeEvent,
-} from 'react';
-import { toast } from 'sonner';
-import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+} from "react";
+import { toast } from "sonner";
+import { useLocalStorage, useWindowSize } from "usehooks-ts";
 
-import { sanitizeUIMessages } from '@/lib/utils';
+import { sanitizeUIMessages } from "@/lib/utils";
 
-import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
-import { PreviewAttachment } from './preview-attachment';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
+import { ArrowUpIcon, PaperclipIcon, StopIcon } from "./icons";
+import { PreviewAttachment } from "./preview-attachment";
+import { Button } from "./ui/button";
+import { Textarea } from "./ui/textarea";
 
 const suggestedActions = [
   {
-    title: 'What is the weather',
-    label: 'in San Francisco?',
-    action: 'What is the weather in San Francisco?',
+    title: "What is the weather",
+    label: "in San Francisco?",
+    action: "What is the weather in San Francisco?",
   },
   {
-    title: 'Help me draft an essay',
-    label: 'about Silicon Valley',
-    action: 'Help me draft a short essay about Silicon Valley',
+    title: "Help me draft an essay",
+    label: "about Silicon Valley",
+    action: "Help me draft a short essay about Silicon Valley",
   },
 ];
 
@@ -87,21 +87,21 @@ export function MultimodalInput({
 
   const adjustHeight = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 2}px`;
     }
   };
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
-    'input',
-    '',
+    "input",
+    "",
   );
 
   useEffect(() => {
     if (textareaRef.current) {
       const domValue = textareaRef.current.value;
       // Prefer DOM value over localStorage to handle hydration
-      const finalValue = domValue || localStorageInput || '';
+      const finalValue = domValue || localStorageInput || "";
       setInput(finalValue);
       adjustHeight();
     }
@@ -122,14 +122,14 @@ export function MultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
-    window.history.replaceState({}, '', `/chat/${chatId}`);
+    window.history.replaceState({}, "", `/chat/${chatId}`);
 
     handleSubmit(undefined, {
       experimental_attachments: attachments,
     });
 
     setAttachments([]);
-    setLocalStorageInput('');
+    setLocalStorageInput("");
 
     if (width && width > 768) {
       textareaRef.current?.focus();
@@ -143,30 +143,34 @@ export function MultimodalInput({
     chatId,
   ]);
 
-  const uploadFile = async (file: File) => {
+  const handleFileUpload = async (file: File) => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
+    formData.append("chatId", chatId);
 
     try {
-      const response = await fetch('/api/files/upload', {
-        method: 'POST',
+      const response = await fetch("/api/files/upload", {
+        method: "POST",
         body: formData,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const { url, pathname, contentType } = data;
-
-        return {
-          url,
-          name: pathname,
-          contentType: contentType,
-        };
+      if (!response.ok) {
+        throw new Error("Upload failed");
       }
-      const { error } = await response.json();
-      toast.error(error);
+
+      const attachment = await response.json();
+      setAttachments((prev) => [...prev, attachment]);
+      
+      // Optionally append a system message about the upload
+      append({
+        role: "system",
+        content: `File "${file.name}" uploaded successfully.`,
+        experimental_attachments: [attachment],
+      });
+
     } catch (error) {
-      toast.error('Failed to upload file, please try again!');
+      console.error("Failed to upload file:", error);
+      toast.error("Failed to upload file");
     }
   };
 
@@ -177,7 +181,7 @@ export function MultimodalInput({
       setUploadQueue(files.map((file) => file.name));
 
       try {
-        const uploadPromises = files.map((file) => uploadFile(file));
+        const uploadPromises = files.map((file) => handleFileUpload(file));
         const uploadedAttachments = await Promise.all(uploadPromises);
         const successfullyUploadedAttachments = uploadedAttachments.filter(
           (attachment) => attachment !== undefined,
@@ -188,7 +192,7 @@ export function MultimodalInput({
           ...successfullyUploadedAttachments,
         ]);
       } catch (error) {
-        console.error('Error uploading files!', error);
+        console.error("Error uploading files!", error);
       } finally {
         setUploadQueue([]);
       }
@@ -209,15 +213,15 @@ export function MultimodalInput({
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ delay: 0.05 * index }}
                 key={`suggested-action-${suggestedAction.title}-${index}`}
-                className={index > 1 ? 'hidden sm:block' : 'block'}
+                className={index > 1 ? "hidden sm:block" : "block"}
               >
                 <Button
                   variant="ghost"
                   onClick={async () => {
-                    window.history.replaceState({}, '', `/chat/${chatId}`);
+                    window.history.replaceState({}, "", `/chat/${chatId}`);
 
                     append({
-                      role: 'user',
+                      role: "user",
                       content: suggestedAction.action,
                     });
                   }}
@@ -252,9 +256,9 @@ export function MultimodalInput({
             <PreviewAttachment
               key={filename}
               attachment={{
-                url: '',
+                url: "",
                 name: filename,
-                contentType: '',
+                contentType: "",
               }}
               isUploading={true}
             />
@@ -268,17 +272,17 @@ export function MultimodalInput({
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-xl text-base bg-muted',
+          "min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-xl text-base bg-muted",
           className,
         )}
         rows={3}
         autoFocus
         onKeyDown={(event) => {
-          if (event.key === 'Enter' && !event.shiftKey) {
+          if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
 
             if (isLoading) {
-              toast.error('Please wait for the model to finish its response!');
+              toast.error("Please wait for the model to finish its response!");
             } else {
               submitForm();
             }
