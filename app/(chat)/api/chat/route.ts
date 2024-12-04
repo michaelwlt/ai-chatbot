@@ -28,6 +28,7 @@ import {
 } from '@/lib/utils';
 
 import { generateTitleFromUserMessage } from '../../actions';
+import { google } from '@ai-sdk/google';
 
 export const maxDuration = 60;
 
@@ -204,7 +205,7 @@ export async function POST(request: Request) {
             system:
               'You are a helpful writing assistant. Based on the description, please update the piece of writing.',
             experimental_providerMetadata: {
-              openai: {
+              google: {
                 prediction: {
                   type: 'content',
                   content: currentContent,
