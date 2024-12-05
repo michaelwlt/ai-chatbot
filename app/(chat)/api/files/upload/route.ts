@@ -1,10 +1,19 @@
-import { put } from '@vercel/blob';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { auth } from '@/app/(auth)/auth';
 
-// Use Blob instead of File since File is not available in Node.js environment
+// Initialize S3 client for R2
+const S3 = new S3Client({
+  region: 'auto',
+  endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
+
 const FileSchema = z.object({
   file: z
     .instanceof(Blob)
@@ -51,12 +60,26 @@ export async function POST(request: Request) {
     const fileBuffer = await file.arrayBuffer();
 
     try {
-      const data = await put(`${filename}`, fileBuffer, {
-        access: 'public',
+      // Upload to R2
+      const uploadCommand = new PutObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: filename,
+        Body: Buffer.from(fileBuffer),
+        ContentType: file.type,
       });
 
-      return NextResponse.json(data);
+      await S3.send(uploadCommand);
+
+      // Return the public URL
+      const fileUrl = `https://${process.env.R2_PUBLIC_DOMAIN}/${filename}`;
+      
+      return NextResponse.json({
+        url: fileUrl,
+        pathname: filename,
+        contentType: file.type
+      });
     } catch (error) {
+      console.error('R2 upload error:', error);
       return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
   } catch (error) {
