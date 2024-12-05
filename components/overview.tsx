@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-import { MessageIcon, BetterGPTIcon } from './icons';
+import { VercelIcon, BetterGPTIcon } from './icons';
 
 export const Overview = () => {
   return (
@@ -17,7 +17,7 @@ export const Overview = () => {
         <p className="flex flex-row justify-center gap-4 items-center">
           <BetterGPTIcon size={50} />
           <span>+</span>
-          <MessageIcon size={32} />
+          <VercelIcon size={40} />
         </p>
         <p>
           This is an{' '}

@@ -59,3 +59,9 @@ pnpm dev
 ```
 
 Your app template should now be running on [localhost:3000](http://localhost:3000/).
+
+
+# Todo
+- test file upload limit; done
+- set cloudflare file delete + email alerts
+- update preview to use original filename

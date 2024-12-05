@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -25,6 +25,46 @@ const FileSchema = z.object({
       message: 'File type should be JPEG or PNG',
     }),
 });
+
+const MAX_STORAGE_LIMIT = (parseInt(process.env.STORAGE_LIMIT_R2|| '1') * 1024 * 1024 * 1024); // Convert GB to bytes
+
+async function getCurrentBucketSize() {
+  try {
+    const command = new ListObjectsV2Command({
+      Bucket: process.env.R2_BUCKET_NAME,
+    });
+    
+    let totalSize = 0;
+    let isTruncated = true;
+    let continuationToken = undefined;
+    
+    while (isTruncated) {
+      const response = await S3.send(command);
+      response.Contents?.forEach(item => {
+        totalSize += item.Size || 0;
+      });
+      
+      isTruncated = response.IsTruncated || false;
+      continuationToken = response.NextContinuationToken;
+      
+      if (continuationToken) {
+        command.input.ContinuationToken = continuationToken;
+      }
+    }
+    
+    return totalSize;
+  } catch (error) {
+    console.error('Error getting bucket size:', error);
+    throw error;
+  }
+}
+
+function generateUniqueFileName(originalName: string): string {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 8);
+  const extension = originalName.split('.').pop();
+  return `${timestamp}-${randomString}.${extension}`;
+}
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -55,27 +95,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
-    // Get filename from formData since Blob doesn't have name property
-    const filename = (formData.get('file') as File).name;
     const fileBuffer = await file.arrayBuffer();
+    const currentSize = await getCurrentBucketSize();
+    
+    if (currentSize + fileBuffer.byteLength > MAX_STORAGE_LIMIT) {
+      return NextResponse.json(
+        { error: 'Storage limit exceeded' },
+        { status: 400 }
+      );
+    }
 
+    // Get filename from formData since Blob doesn't have name property
+    const originalFilename = (formData.get('file') as File).name;
+    const uniqueFilename = generateUniqueFileName(originalFilename);
+    
     try {
-      // Upload to R2
+      // Upload to R2 with unique filename
       const uploadCommand = new PutObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME,
-        Key: filename,
+        Key: uniqueFilename,
         Body: Buffer.from(fileBuffer),
         ContentType: file.type,
+        Metadata: {
+          originalName: originalFilename // Store original filename as metadata
+        }
       });
 
       await S3.send(uploadCommand);
 
-      // Return the public URL
-      const fileUrl = `https://${process.env.R2_PUBLIC_DOMAIN}/${filename}`;
+      // Return the public URL with unique filename
+      const fileUrl = `https://${process.env.R2_PUBLIC_DOMAIN}/${uniqueFilename}`;
       
       return NextResponse.json({
         url: fileUrl,
-        pathname: filename,
+        pathname: uniqueFilename,
+        originalName: originalFilename,
         contentType: file.type
       });
     } catch (error) {
