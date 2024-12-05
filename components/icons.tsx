@@ -855,3 +855,18 @@ export const CheckCirclFillIcon = ({ size = 16 }: { size?: number }) => {
     </svg>
   );
 };
+
+export const BetterGPTIcon = ({ size = 16 }: { size?: number }) => {
+  return (
+    <img 
+      src="/images/icon.png"
+      alt="Custom Icon"
+      width={size}
+      height={size}
+      style={{ 
+        display: 'inline-block',
+        verticalAlign: 'middle'
+      }}
+    />
+  );
+};

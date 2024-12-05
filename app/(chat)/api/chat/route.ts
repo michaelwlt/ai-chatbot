@@ -100,10 +100,23 @@ export async function POST(request: Request) {
       getWeather: {
         description: 'Get the current weather at a location',
         parameters: z.object({
-          latitude: z.number(),
-          longitude: z.number(),
+          location: z.string(),
         }),
-        execute: async ({ latitude, longitude }) => {
+        execute: async ({ location }) => {
+          // First, geocode the location to get coordinates
+          const geocodeResponse = await fetch(
+            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=en&format=json`
+          );
+          
+          const geocodeData = await geocodeResponse.json();
+          
+          if (!geocodeData.results?.[0]) {
+            throw new Error(`Could not find coordinates for location: ${location}`);
+          }
+          
+          const { latitude, longitude } = geocodeData.results[0];
+
+          // Then get the weather using the coordinates
           const response = await fetch(
             `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=temperature_2m&daily=sunrise,sunset&timezone=auto`,
           );
