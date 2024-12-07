@@ -27,7 +27,7 @@ export function AuthForm({
       <input
         type="password"
         name="password"
-        placeholder="never gonna give you up"
+        placeholder="your_password"
         required
         className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-gray-400 focus:outline-none"
       />

@@ -45,9 +45,7 @@ export default function Page() {
       <div className="w-full max-w-md overflow-hidden flex flex-col gap-8">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center">
           <div className="flex items-center gap-2">
-            <div onContextMenu={(e) => e.preventDefault()} style={{ pointerEvents: 'none' }}>
-              <BetterGPTIcon size={40} />
-            </div>
+            <BetterGPTIcon size={45} />
             <h3 className="text-2xl font-semibold">Sign In to BetterGPT</h3>
           </div>
         </div>
