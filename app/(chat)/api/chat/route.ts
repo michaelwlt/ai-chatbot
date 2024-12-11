@@ -22,7 +22,7 @@ import {
 } from '@/lib/db/queries';
 import type { Suggestion } from '@/lib/db/schema';
 import {
-  generateUUID,
+  generateSecureId,
   getMostRecentUserMessage,
   sanitizeResponseMessages,
 } from '@/lib/utils';
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     await saveChat({ id, userId: session.user.id, title });
   }
 
-  const userMessageId = generateUUID();
+  const userMessageId = generateSecureId();
 
   await saveMessages({
     messages: [
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
           title: z.string(),
         }),
         execute: async ({ title }) => {
-          const id = generateUUID();
+          const id = generateSecureId();
           let draftText = '';
 
           streamingData.append({
@@ -313,7 +313,7 @@ export async function POST(request: Request) {
               originalText: element.originalSentence,
               suggestedText: element.suggestedSentence,
               description: element.description,
-              id: generateUUID(),
+              id: generateSecureId(),
               documentId: documentId,
               isResolved: false,
             };
@@ -356,7 +356,7 @@ export async function POST(request: Request) {
           await saveMessages({
             messages: responseMessagesWithoutIncompleteToolCalls.map(
               (message) => {
-                const messageId = generateUUID();
+                const messageId = generateSecureId();
 
                 if (message.role === 'assistant') {
                   streamingData.appendMessageAnnotation({
