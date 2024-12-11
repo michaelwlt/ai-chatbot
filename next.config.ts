@@ -1,14 +1,20 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  experimental: {
-    ppr: true,
-  },
+  experimental: {},
   images: {
     remotePatterns: [
       {
-        hostname: 'avatar.vercel.sh',
+        protocol: "https",
+        hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
+        hostname: "avatar.vercel.sh",
       },
     ],
   },

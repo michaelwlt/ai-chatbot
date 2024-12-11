@@ -6,9 +6,12 @@ import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+  metadataBase: new URL('https://bettergpt.lol'),
+  title: 'BetterGPT v2',
+  description: 'A BetterGPT rewrite using Vercel AI SDK.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export const viewport = {

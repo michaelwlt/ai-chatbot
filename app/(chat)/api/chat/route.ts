@@ -28,6 +28,7 @@ import {
 } from '@/lib/utils';
 
 import { generateTitleFromUserMessage } from '../../actions';
+import { google } from '@ai-sdk/google';
 
 export const maxDuration = 60;
 
@@ -81,13 +82,20 @@ export async function POST(request: Request) {
     await saveChat({ id, userId: session.user.id, title });
   }
 
+  const userMessageId = generateUUID();
+
   await saveMessages({
     messages: [
-      { ...userMessage, id: generateUUID(), createdAt: new Date(), chatId: id },
+      { ...userMessage, id: userMessageId, createdAt: new Date(), chatId: id },
     ],
   });
 
   const streamingData = new StreamData();
+
+  streamingData.append({
+    type: 'user-message-id',
+    content: userMessageId,
+  });
 
   const result = streamText({
     model: customModel(model.apiIdentifier),
@@ -99,10 +107,23 @@ export async function POST(request: Request) {
       getWeather: {
         description: 'Get the current weather at a location',
         parameters: z.object({
-          latitude: z.number(),
-          longitude: z.number(),
+          location: z.string(),
         }),
-        execute: async ({ latitude, longitude }) => {
+        execute: async ({ location }) => {
+          // First, geocode the location to get coordinates
+          const geocodeResponse = await fetch(
+            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=en&format=json`
+          );
+          
+          const geocodeData = await geocodeResponse.json();
+          
+          if (!geocodeData.results?.[0]) {
+            throw new Error(`Could not find coordinates for location: ${location}`);
+          }
+          
+          const { latitude, longitude } = geocodeData.results[0];
+
+          // Then get the weather using the coordinates
           const response = await fetch(
             `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=temperature_2m&daily=sunrise,sunset&timezone=auto`,
           );
@@ -204,7 +225,7 @@ export async function POST(request: Request) {
             system:
               'You are a helpful writing assistant. Based on the description, please update the piece of writing.',
             experimental_providerMetadata: {
-              openai: {
+              google: {
                 prediction: {
                   type: 'content',
                   content: currentContent,

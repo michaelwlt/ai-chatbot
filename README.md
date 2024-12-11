@@ -59,3 +59,11 @@ pnpm dev
 ```
 
 Your app template should now be running on [localhost:3000](http://localhost:3000/).
+
+# Credits
+[Scenarium icons created by Vector Stall - Flaticon](https://www.flaticon.com/free-icons/scenarium)
+
+# Todo
+- test file upload limit; done
+- set cloudflare file delete + email alerts; done
+- update preview to use original filename; done

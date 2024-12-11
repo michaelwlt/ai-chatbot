@@ -1,10 +1,11 @@
-import { Message } from 'ai';
+import { ChatRequestOptions, Message } from 'ai';
 import { PreviewMessage, ThinkingMessage } from './message';
 import { useScrollToBottom } from './use-scroll-to-bottom';
 import { Overview } from './overview';
 import { UIBlock } from './block';
 import { Dispatch, memo, SetStateAction } from 'react';
 import { Vote } from '@/lib/db/schema';
+import equal from 'fast-deep-equal';
 
 interface MessagesProps {
   chatId: string;
@@ -13,6 +14,13 @@ interface MessagesProps {
   isLoading: boolean;
   votes: Array<Vote> | undefined;
   messages: Array<Message>;
+  setMessages: (
+    messages: Message[] | ((messages: Message[]) => Message[]),
+  ) => void;
+  reload: (
+    chatRequestOptions?: ChatRequestOptions,
+  ) => Promise<string | null | undefined>;
+  isReadonly: boolean;
 }
 
 function PureMessages({
@@ -22,6 +30,9 @@ function PureMessages({
   isLoading,
   votes,
   messages,
+  setMessages,
+  reload,
+  isReadonly,
 }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -46,6 +57,9 @@ function PureMessages({
               ? votes.find((vote) => vote.messageId === message.id)
               : undefined
           }
+          setMessages={setMessages}
+          reload={reload}
+          isReadonly={isReadonly}
         />
       ))}
 
@@ -61,15 +75,11 @@ function PureMessages({
   );
 }
 
-function areEqual(prevProps: MessagesProps, nextProps: MessagesProps) {
-  if (
-    prevProps.block.status === 'streaming' &&
-    nextProps.block.status === 'streaming'
-  ) {
-    return true;
-  }
+export const Messages = memo(PureMessages, (prevProps, nextProps) => {
+  if (prevProps.isLoading !== nextProps.isLoading) return false;
+  if (prevProps.isLoading && nextProps.isLoading) return false;
+  if (prevProps.messages.length !== nextProps.messages.length) return false;
+  if (!equal(prevProps.votes, nextProps.votes)) return false;
 
-  return false;
-}
-
-export const Messages = memo(PureMessages, areEqual);
+  return true;
+});
