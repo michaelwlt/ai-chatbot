@@ -15,6 +15,11 @@ export const authConfig = {
       const isOnChat = nextUrl.pathname.startsWith('/');
       const isOnRegister = nextUrl.pathname.startsWith('/register');
       const isOnLogin = nextUrl.pathname.startsWith('/login');
+      const isFavicon = nextUrl.pathname === '/favicon.ico';
+      // Allow access to favicon
+      if (isFavicon) {
+        return true;
+      }
 
       if (isLoggedIn && (isOnLogin || isOnRegister)) {
         return Response.redirect(new URL('/', nextUrl as unknown as URL));

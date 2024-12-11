@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: 'BetterGPT v2',
   description: 'A BetterGPT rewrite using Vercel AI SDK.',
   icons: {
-    icon: '/favicon.ico',
+    icon: 'favicon.ico',
   },
 };
 
