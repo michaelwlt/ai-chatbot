@@ -17,8 +17,6 @@ import {
   vote,
 } from './schema';
 
-import { generateSecureId } from '../utils';
-
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
 // https://authjs.dev/reference/adapter/drizzle
@@ -169,12 +167,12 @@ export async function getVotesByChatId({ id }: { id: string }) {
 }
 
 export async function saveDocument({
-  id = generateSecureId(),
+  id,
   title,
   content,
   userId,
 }: {
-  id?: string;
+  id: string;
   title: string;
   content: string;
   userId: string;
