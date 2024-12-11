@@ -115,10 +115,6 @@ function PureMultimodalInput({
 
     handleSubmit(undefined, {
       experimental_attachments: attachments,
-      experimental_continueSteps: true,
-      maxSteps: 5,
-      experimental_continue: true,
-      experimental_resetSteps: false,
     });
 
     setAttachments([]);
