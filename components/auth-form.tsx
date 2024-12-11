@@ -82,7 +82,9 @@ export function AuthForm({
       hasTurnstileResponse: !!formData.get('cf-turnstile-response')
     });
     
-    return action(formData);
+    if (typeof action === 'function') {
+      return action(formData);
+    }
   };
 
   return (
