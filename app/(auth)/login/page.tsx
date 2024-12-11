@@ -51,19 +51,19 @@ export default function Page() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 px-4">
-          <button className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
+          <button type="button" className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
             <GitIcon />
             GitHub
           </button>
-          <button className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
+          <button type="button" className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
             <LogoDiscord />
             Discord
           </button>
-          <button className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
+          <button type="button" className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
             <LogoSpotify />
             Spotify
           </button>
-          <button className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
+          <button type="button" className="flex items-center justify-center gap-2 rounded-lg border p-2 hover:bg-gray-50">
             <LogoGoogle />
             Google
           </button>
