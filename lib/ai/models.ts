@@ -21,9 +21,9 @@ export const models: Array<Model> = [
     description: 'For complex, multi-step tasks',
   },
   {
-    id: 'gemini-exp-1121',
+    id: 'gemini-exp-1206',
     label: 'Gemini Experimental',
-    apiIdentifier: 'gemini-exp-1121',
+    apiIdentifier: 'gemini-exp-1206',
     description: 'Improved coding, reasoning, and vision capabilities',
   },
 ] as const;
