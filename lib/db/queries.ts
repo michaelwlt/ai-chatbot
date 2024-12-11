@@ -4,6 +4,7 @@ import { genSaltSync, hashSync } from 'bcrypt-ts';
 import { and, asc, desc, eq, gt, gte } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import { generateSecureId } from '../utils';
 
 import {
   user,
@@ -167,12 +168,12 @@ export async function getVotesByChatId({ id }: { id: string }) {
 }
 
 export async function saveDocument({
-  id,
+  id = generateSecureId(),
   title,
   content,
   userId,
 }: {
-  id: string;
+  id?: string;
   title: string;
   content: string;
   userId: string;

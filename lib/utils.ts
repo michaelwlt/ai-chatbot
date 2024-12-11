@@ -44,7 +44,7 @@ export function getLocalStorage(key: string) {
   return [];
 }
 
-export function generateUUID(): string {
+export function generateSecureId(): string {
   return randomBytes(16).toString('hex');
 }
 
